@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../screens/product_detail_screen.dart';
+
 class ProductItem extends StatelessWidget {
   final String id;
   final String title;
@@ -29,13 +31,28 @@ class ProductItem extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.0),
         child: GridTile(
-          child: GestureDetector(
-            onTap: () {},
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
+          child: Material(
+            child: InkWell(
+              splashColor: Colors.black12,
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  ProductDetailScreen.routeName,
+                  arguments: id,
+                );
+              },
+              child: Ink.image(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
+          // child: GestureDetector(
+          //   onTap: () {},
+          //   child: Image.network(
+          //     imageUrl,
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
           footer: GridTileBar(
             backgroundColor: Colors.black87,
             leading: IconButton(
