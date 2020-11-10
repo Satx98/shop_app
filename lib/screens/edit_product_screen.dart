@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop_app/providers/product.dart';
 
 class EditPoductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
@@ -8,9 +9,18 @@ class EditPoductScreen extends StatefulWidget {
 }
 
 class _EditPoductScreenState extends State<EditPoductScreen> {
+  final _form = GlobalKey<FormState>();
+
   var _imageUrl = '';
   var _hasErrorLoadingImage = false;
   var _loadingImage = false;
+  var _editedProduct = Product(
+    id: null,
+    title: '',
+    description: '',
+    price: 0.0,
+    imageUrl: '',
+  );
 
   Future<void> _updateImageUrl(String imageUrl) async {
     setState(() {
@@ -24,7 +34,7 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
       await precacheImage(
         NetworkImage(_imageUrl),
         context,
-        onError: (error, stackTrace) {
+        onError: (_, __) {
           if (!_loadingImage) {
             return;
           }
@@ -38,6 +48,14 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
         _loadingImage = false;
       });
     }
+  }
+
+  void _saveForm() {
+    _form.currentState.save();
+    print(_editedProduct.title);
+    print(_editedProduct.price);
+    print(_editedProduct.description);
+    print(_editedProduct.imageUrl);
   }
 
   Widget _imageBuilder() {
@@ -88,20 +106,45 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Edit Product'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _saveForm,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
+          key: _form,
           child: SingleChildScrollView(
             child: Column(
               children: [
                 TextFormField(
+                  onSaved: (newValue) {
+                    _editedProduct = Product(
+                      id: null,
+                      title: newValue,
+                      description: _editedProduct.description,
+                      price: _editedProduct.price,
+                      imageUrl: _editedProduct.imageUrl,
+                    );
+                  },
                   decoration: InputDecoration(
                     labelText: 'Title',
                   ),
                   textInputAction: TextInputAction.next,
                 ),
                 TextFormField(
+                  onSaved: (newValue) {
+                    _editedProduct = Product(
+                      id: null,
+                      title: _editedProduct.title,
+                      description: _editedProduct.description,
+                      price: double.parse(newValue),
+                      imageUrl: _editedProduct.imageUrl,
+                    );
+                  },
                   decoration: InputDecoration(
                     labelText: 'Price',
                   ),
@@ -109,6 +152,15 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
                   keyboardType: TextInputType.number,
                 ),
                 TextFormField(
+                  onSaved: (newValue) {
+                    _editedProduct = Product(
+                      id: null,
+                      title: _editedProduct.title,
+                      description: newValue,
+                      price: _editedProduct.price,
+                      imageUrl: _editedProduct.imageUrl,
+                    );
+                  },
                   decoration: InputDecoration(
                     labelText: 'Description',
                   ),
@@ -140,10 +192,22 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
                     ),
                     Expanded(
                       child: TextFormField(
+                        onSaved: (newValue) {
+                          _editedProduct = Product(
+                            id: null,
+                            title: _editedProduct.title,
+                            description: _editedProduct.description,
+                            price: _editedProduct.price,
+                            imageUrl: newValue,
+                          );
+                        },
                         decoration: InputDecoration(labelText: 'Image URL'),
                         keyboardType: TextInputType.url,
                         textInputAction: TextInputAction.done,
                         onChanged: _updateImageUrl,
+                        onFieldSubmitted: (_) {
+                          _saveForm();
+                        },
                       ),
                     ),
                   ],
