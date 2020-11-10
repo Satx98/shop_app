@@ -51,6 +51,10 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
   }
 
   void _saveForm() {
+    final isValid = _form.currentState.validate();
+    if (!isValid) {
+      return;
+    }
     _form.currentState.save();
     print(_editedProduct.title);
     print(_editedProduct.price);
@@ -130,8 +134,15 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
                       imageUrl: _editedProduct.imageUrl,
                     );
                   },
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please provide a \'Title\'.';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     labelText: 'Title',
+                    helperText: ' ',
                   ),
                   textInputAction: TextInputAction.next,
                 ),
@@ -145,8 +156,21 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
                       imageUrl: _editedProduct.imageUrl,
                     );
                   },
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a \'Price\'.';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Please enter a valid number.';
+                    }
+                    if (double.parse(value) <= 0.0) {
+                      return 'Please enter a number greater than 0.';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     labelText: 'Price',
+                    helperText: ' ',
                   ),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.number,
@@ -161,8 +185,18 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
                       imageUrl: _editedProduct.imageUrl,
                     );
                   },
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter a \'Description\'.';
+                    }
+                    if (value.length < 10) {
+                      return 'Should have at least 10 characters long.';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     labelText: 'Description',
+                    helperText: ' ',
                   ),
                   maxLines: 3,
                   keyboardType: TextInputType.multiline,
@@ -200,6 +234,18 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
                             price: _editedProduct.price,
                             imageUrl: newValue,
                           );
+                        },
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter an \'Image URL\'.';
+                          }
+                          if (_loadingImage) {
+                            return 'Please wait a moment! The image is currently loading...';
+                          }
+                          if (_hasErrorLoadingImage) {
+                            return 'Please enter a valid image URL.';
+                          }
+                          return null;
                         },
                         decoration: InputDecoration(labelText: 'Image URL'),
                         keyboardType: TextInputType.url,
