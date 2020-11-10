@@ -8,36 +8,21 @@ class EditPoductScreen extends StatefulWidget {
 }
 
 class _EditPoductScreenState extends State<EditPoductScreen> {
-  final _imageUrlController = TextEditingController();
-  final _imageUrlFocusNode = FocusNode();
-
+  var _imageUrl = '';
   var _hasErrorLoadingImage = false;
   var _loadingImage = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _imageUrlController.addListener(_updateImageUrl);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _imageUrlController.removeListener(_updateImageUrl);
-    _imageUrlController.dispose();
-    _imageUrlFocusNode.dispose();
-  }
-
-  Future<void> _updateImageUrl() async {
+  Future<void> _updateImageUrl(String imageUrl) async {
     setState(() {
+      _imageUrl = imageUrl;
       _hasErrorLoadingImage = false;
     });
-    if (_imageUrlController.text.isNotEmpty) {
+    if (_imageUrl.isNotEmpty) {
       setState(() {
         _loadingImage = true;
       });
       await precacheImage(
-        NetworkImage(_imageUrlController.text),
+        NetworkImage(_imageUrl),
         context,
         onError: (error, stackTrace) {
           if (!_loadingImage) {
@@ -56,7 +41,7 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
   }
 
   Widget _imageBuilder() {
-    if (_imageUrlController.text.isEmpty) {
+    if (_imageUrl.isEmpty) {
       return Center(
         child: Text(
           'Enter a URL',
@@ -94,7 +79,7 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
       );
     }
     return FittedBox(
-      child: Image.network(_imageUrlController.text),
+      child: Image.network(_imageUrl),
     );
   }
 
@@ -158,8 +143,7 @@ class _EditPoductScreenState extends State<EditPoductScreen> {
                         decoration: InputDecoration(labelText: 'Image URL'),
                         keyboardType: TextInputType.url,
                         textInputAction: TextInputAction.done,
-                        controller: _imageUrlController,
-                        focusNode: _imageUrlFocusNode,
+                        onChanged: _updateImageUrl,
                       ),
                     ),
                   ],
