@@ -23,6 +23,7 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
 
     return Container(
       decoration: BoxDecoration(
@@ -69,10 +70,8 @@ class ProductItem extends StatelessWidget {
                 ),
                 onPressed: () {
                   product.toggleFavoriteStatus(
-                    Provider.of<Auth>(
-                      context,
-                      listen: false,
-                    ).token,
+                    authData.token,
+                    authData.userId,
                   );
                 },
                 color: Theme.of(context).accentColor,
