@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id;
@@ -66,7 +67,14 @@ class ProductItem extends StatelessWidget {
                 icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 ),
-                onPressed: product.toggleFavoriteStatus,
+                onPressed: () {
+                  product.toggleFavoriteStatus(
+                    Provider.of<Auth>(
+                      context,
+                      listen: false,
+                    ).token,
+                  );
+                },
                 color: Theme.of(context).accentColor,
               ),
             ),
