@@ -9,6 +9,11 @@ import '../screens/edit_product_screen.dart';
 class UserProductsScreen extends StatelessWidget {
   static const routeName = '/user-products';
 
+  Future<void> _refreshProducts(BuildContext context) {
+    return Provider.of<Products>(context, listen: false)
+        .fetchAndSetProducts(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,24 +29,31 @@ class UserProductsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () => Provider.of<Products>(
-          context,
-          listen: false,
-        ).fetchAndSetProducts(),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Consumer<Products>(
-            builder: (ctx, productsData, _) => ListView.builder(
-              itemBuilder: (_, i) => UserProductItem(
-                productsData.items[i].id,
-                productsData.items[i].title,
-                productsData.items[i].imageUrl,
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (_, dataSnapshot) {
+          if (dataSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return RefreshIndicator(
+            onRefresh: () => _refreshProducts(context),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Consumer<Products>(
+                builder: (ctx, productsData, _) => ListView.builder(
+                  itemBuilder: (_, i) => UserProductItem(
+                    productsData.items[i].id,
+                    productsData.items[i].title,
+                    productsData.items[i].imageUrl,
+                  ),
+                  itemCount: productsData.items.length,
+                ),
               ),
-              itemCount: productsData.items.length,
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
