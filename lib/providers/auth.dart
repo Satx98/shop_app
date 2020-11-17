@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/http_exception.dart';
+
 class Auth with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
@@ -13,19 +15,35 @@ class Auth with ChangeNotifier {
     String password,
     String urlSegment,
   ) async {
-    final url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyBAi3tMxBqUj4y9c1Sq5Lmq99QSJlZOWVQ';
+    try {
+      final url =
+          'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyBAi3tMxBqUj4y9c1Sq5Lmq99QSJlZOWVQ';
 
-    final response = await http.post(
-      url,
-      body: json.encode({
-        'email': email,
-        'password': password,
-        'returnSecureToken': true,
-      }),
-    );
+      final response = await http.post(
+        url,
+        body: json.encode({
+          'email': email,
+          'password': password,
+          'returnSecureToken': true,
+        }),
+      );
 
-    print(json.decode(response.body));
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) {
+        throw HttpException(responseData['error']['message']);
+      }
+
+      _token = responseData['idToken'];
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(responseData['expiresIn']),
+        ),
+      );
+      _userId = responseData['localId'];
+    } catch (error) {
+      print(error);
+      throw error;
+    }
   }
 
   Future<void> signup(String email, String password) async {
