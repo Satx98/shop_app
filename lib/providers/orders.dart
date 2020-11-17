@@ -22,8 +22,9 @@ class OrderItem {
 class Orders with ChangeNotifier {
   var _orders = <OrderItem>[];
   final String authToken;
+  final String userId;
 
-  Orders(this.authToken, this._orders);
+  Orders(this.authToken, this.userId, this._orders);
 
   List<OrderItem> get orders {
     return [..._orders];
@@ -31,7 +32,7 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     final url =
-        'https://flutter-project-iamgood.firebaseio.com/orders.json?auth=$authToken';
+        'https://flutter-project-iamgood.firebaseio.com/orders/$userId.json?auth=$authToken';
 
     try {
       final response = await http.get(url);
@@ -73,7 +74,7 @@ class Orders with ChangeNotifier {
     double total,
   ) async {
     final url =
-        'https://flutter-project-iamgood.firebaseio.com/orders.json?auth=$authToken';
+        'https://flutter-project-iamgood.firebaseio.com/orders/$userId.json?auth=$authToken';
 
     final timestamp = DateTime.now();
 
