@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/auth.dart';
 
 enum AuthMode {
   SignUp,
@@ -98,7 +101,7 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -109,7 +112,22 @@ class _AuthCardState extends State<AuthCard> {
     });
 
     if (_authMode == AuthMode.Login) {
-    } else {}
+      await Provider.of<Auth>(
+        context,
+        listen: false,
+      ).login(
+        _authData['email'],
+        _authData['password'],
+      );
+    } else {
+      await Provider.of<Auth>(
+        context,
+        listen: false,
+      ).signup(
+        _authData['email'],
+        _authData['password'],
+      );
+    }
 
     setState(() {
       _isLoading = false;
@@ -149,6 +167,7 @@ class _AuthCardState extends State<AuthCard> {
                 TextFormField(
                   decoration: InputDecoration(labelText: 'E-Mail'),
                   keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
                   validator: (value) {
                     if (value.isEmpty || !value.contains('@')) {
                       return 'Invalid email!';
@@ -163,6 +182,9 @@ class _AuthCardState extends State<AuthCard> {
                   decoration: InputDecoration(labelText: 'Password'),
                   obscureText: true,
                   controller: _passwordController,
+                  textInputAction: _authMode == AuthMode.SignUp
+                      ? TextInputAction.next
+                      : TextInputAction.done,
                   validator: (value) {
                     if (value.isEmpty || value.length < 5) {
                       return 'Password is too short!';
@@ -172,13 +194,18 @@ class _AuthCardState extends State<AuthCard> {
                   onSaved: (newValue) {
                     _authData['password'] = newValue;
                   },
+                  onFieldSubmitted: _authMode == AuthMode.SignUp
+                      ? null
+                      : (_) {
+                          _submit();
+                        },
                 ),
                 if (_authMode == AuthMode.SignUp)
                   TextFormField(
                     enabled: _authMode == AuthMode.SignUp,
                     decoration: InputDecoration(labelText: 'Confirm Password'),
                     obscureText: true,
-                    controller: _passwordController,
+                    textInputAction: TextInputAction.done,
                     validator: _authMode == AuthMode.SignUp
                         ? (value) {
                             if (value != _passwordController.text) {
@@ -187,6 +214,9 @@ class _AuthCardState extends State<AuthCard> {
                             return null;
                           }
                         : null,
+                    onFieldSubmitted: (_) {
+                      _submit();
+                    },
                   ),
                 SizedBox(
                   height: 20,
