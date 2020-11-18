@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/orders_screen.dart';
 import '../screens/user_products_screen.dart';
+import '../providers/auth.dart';
 
 class AppDrawer extends StatelessWidget {
   List<Widget> appDrawerItemBuilder({
     @required BuildContext context,
     @required String label,
     @required IconData icon,
-    @required String routeName,
+    @required void Function() onTap,
   }) {
     return [
       Divider(),
       ListTile(
         leading: Icon(icon),
         title: Text(label),
-        onTap: () {
-          Navigator.of(context).pushReplacementNamed(routeName);
-        },
+        onTap: onTap,
       ),
     ];
   }
@@ -35,20 +35,35 @@ class AppDrawer extends StatelessWidget {
             context: context,
             label: 'Shop',
             icon: Icons.shop,
-            routeName: '/',
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/');
+            },
           ),
           ...appDrawerItemBuilder(
-            context: context,
-            label: 'Orders',
-            icon: Icons.payment,
-            routeName: OrdersScreen.routeName,
-          ),
+              context: context,
+              label: 'Orders',
+              icon: Icons.payment,
+              onTap: () {
+                Navigator.of(context)
+                    .pushReplacementNamed(OrdersScreen.routeName);
+              }),
           ...appDrawerItemBuilder(
-            context: context,
-            label: 'Manage Products',
-            icon: Icons.edit,
-            routeName: UserProductsScreen.routeName,
-          ),
+              context: context,
+              label: 'Manage Products',
+              icon: Icons.edit,
+              onTap: () {
+                Navigator.of(context)
+                    .pushReplacementNamed(UserProductsScreen.routeName);
+              }),
+          ...appDrawerItemBuilder(
+              context: context,
+              label: 'Logout',
+              icon: Icons.exit_to_app,
+              onTap: () {
+                Navigator.of(context).pop();
+                Provider.of<Auth>(context, listen: false).logout();
+                Navigator.of(context).pushReplacementNamed('/');
+              }),
         ],
       ),
     );
