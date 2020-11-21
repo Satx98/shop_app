@@ -53,6 +53,11 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.purple,
             accentColor: Colors.deepOrange,
             fontFamily: 'Lato',
+            appBarTheme: ThemeData.light().appBarTheme.copyWith(
+                  iconTheme: IconThemeData(
+                    color: Colors.grey.shade300,
+                  ),
+                ),
             visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
           home: auth.isAuth
