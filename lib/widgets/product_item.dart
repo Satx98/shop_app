@@ -39,19 +39,32 @@ class ProductItem extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.0),
         child: GridTile(
-          child: Material(
-            child: InkWell(
-              splashColor: Colors.black12,
-              onTap: () {
-                Navigator.of(context).pushNamed(
-                  ProductDetailScreen.routeName,
-                  arguments: product.id,
-                );
-              },
-              child: Ink.image(
-                image: NetworkImage(product.imageUrl),
-                fit: BoxFit.cover,
-              ),
+          child: ColoredBox(
+            color: Colors.white,
+            child: Stack(
+              children: [
+                SizedBox.expand(
+                  child: FadeInImage(
+                    placeholder:
+                        AssetImage('assets/images/product-placeholder.png'),
+                    image: NetworkImage(product.imageUrl),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Material(
+                  type: MaterialType.transparency,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10.0),
+                    splashColor: Colors.black12,
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        ProductDetailScreen.routeName,
+                        arguments: product.id,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           // child: GestureDetector(
