@@ -36,6 +36,9 @@ class ProductDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
+            iconTheme: IconThemeData(
+              color: Colors.blueGrey.shade200,
+            ),
           ),
           SliverList(
             delegate: SliverChildListDelegate([
